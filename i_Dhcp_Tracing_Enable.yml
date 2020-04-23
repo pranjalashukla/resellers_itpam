@@ -82,7 +82,7 @@
         name: snow_update
         tasks_from: transfer
       vars: 
-        failure_closing_note: "Could not fetch DNS Diagnostics. {{ dns_diag_error }} Hence transferring the ticket."
+        failure_closing_note: "Could not enable the dhcpclient tracing : {{ dhcp_status_error }} Hence transferring the ticket."
         L2_group: "{{ L2_grp }}"
       when: status_code is defined  
 
