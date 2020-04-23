@@ -1,0 +1,14 @@
+---
+
+- name: get firewall rules
+  win_shell: Netsh advfirewall show allprofile
+  register: firewall_rules
+
+- debug:
+    var: firewall_rules
+
+- set_fact:
+    status_code: 2
+    firewall_rules_error: "{{ firewall_rules.stderr }}"
+  when: firewall_rules is failed
+
