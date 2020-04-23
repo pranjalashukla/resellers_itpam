@@ -1,0 +1,16 @@
+---
+#- include_vars: snow_credentials.yml
+#  no_log: True
+
+- name: update snow incident about assigning ticket to ansible
+  snow_record:
+    username: "{{ username }}"
+    password: "{{ password }}"
+    instance: "{{ instance_name }}"
+    state: present
+    number: "{{ snow_incident_id }}"
+    data:
+      work_notes : "{{ assign_ansible }}"
+      state: "Work In Progress"
+  delegate_to: localhost
+  become: false

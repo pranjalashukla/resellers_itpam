@@ -1,0 +1,20 @@
+---
+#- include_vars: snow_credentials.yml
+#  no_log: True
+
+- name: Update snow incident status worknotes and close notes update
+  snow_record:
+    username: "{{ username }}"
+    password: "{{ password }}"
+    instance: "{{ instance_name }}"
+    state: present
+    number: "{{ snow_incident_id }}"
+    data:
+      work_notes : "{{ resolve_message }}"
+      state: "Resolved"
+      u_resolve_code: "Resolved - Unconfirmed"
+      close_notes: "{{ success_closing_note }}"
+      assigned_to: "{{ username }}"
+  delegate_to: localhost  
+  become: false
+
