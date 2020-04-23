@@ -1,0 +1,29 @@
+---
+- name: Fetch Snow URL
+
+  command: sqlcmd -S {{ snow_db_host }} -U {{ snow_db_username }} -P {{ snow_db_password }} -Q "SELECT VarValue FROM [iAutomate_Ansible].[dbo].[Iautomate_Ansible_AccountDetails] where TenantID='{{ tenant_id }}' and VarName='Snow_URL'"
+  register: snow_url
+
+- debug:
+    var: snow_url.stdout_lines[2].split('.')[0].split('//')[1]
+
+- name: Fetch Snow Username
+  command: sqlcmd -S {{ snow_db_host }} -U {{ db_username }} -P {{db_password }} -Q "SELECT VarValue FROM [iAutomate_Ansible].[dbo].[Iautomate_Ansible_AccountDetails] where TenantID='{{ tenant_id }}' and VarName='Snow_Username'"
+  register: snow_username
+
+- debug:
+    var: snow_username.stdout_lines[2] | regex_replace(' ','')
+
+- name: Fetch Snow password
+  command: sqlcmd -S {{ snow_db_host }} -U {{ db_username }} -P {{ db_password }} -Q "SELECT VarValue FROM [iAutomate_Ansible].[dbo].[Iautomate_Ansible_AccountDetails] where TenantID='{{ tenant_id }}' and VarName='Snow_Password'"
+  register: snow_pass
+
+- debug:
+    var: snow_pass.stdout_lines[2] | regex_replace(' ','')
+
+- name: Fetch Snow Assignment Group
+  command: sqlcmd -S {{ snow_db_host }} -U {{ db_username }} -P {{ db_password }} -Q "SELECT VarValue FROM [iAutomate_Ansible].[dbo].[Iautomate_Ansible_AccountDetails] where TenantID='{{ tenant_id }}' and VarName='Snow_assignmentGroup'"
+  register: snow_assign_group
+
+- debug:
+    var: snow_assign_group.stdout_lines[2]

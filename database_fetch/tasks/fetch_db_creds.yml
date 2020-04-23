@@ -1,0 +1,14 @@
+- name: Fetch database Username
+  command: sqlcmd -S {{ snow_db_host }} -U {{ db_username }} -P {{db_password }} -Q "SELECT VarValue FROM [iAutomate_Ansible].[dbo].[Iautomate_Ansible_AccountDetails] where TenantID='{{ tenant_id }}' and VarName='SQL_username'"
+  register: sql_username
+
+- debug:
+    var: sql_username.stdout_lines[2] | regex_replace(' ','')
+
+- name: Fetch database password
+  command: sqlcmd -S {{ snow_db_host }} -U {{ db_username }} -P {{ db_password }} -Q "SELECT VarValue FROM [iAutomate_Ansible].[dbo].[Iautomate_Ansible_AccountDetails] where TenantID='{{ tenant_id }}' and VarName='SQL_password'"
+  register: sql_password
+
+- debug:
+    var: sql_password.stdout_lines[2] | regex_replace(' ','')
+
