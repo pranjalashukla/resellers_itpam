@@ -7,6 +7,7 @@
       groups: windows_iautomate
   
   - include: snow_database_fetch.yml
+  - include: database_creds_fetch.yml
 
 - hosts: windows_iautomate
   gather_facts: no
@@ -22,6 +23,8 @@
         password: "{{ hostvars['localhost']['snow_password'] }}"
         instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
         L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
+        db_user: "{{ hostvars['localhost']['db_user'] }}"
+        db_pass: "{{ hostvars['localhost']['db_pass'] }}"
 
     - include_role:
         name: iautomate_update
