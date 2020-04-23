@@ -1,0 +1,22 @@
+---
+# tasks file for iautomate_update
+- include_vars: iautomate_credentials.yml
+#  no_log: True
+
+- name: update iautomate url about status
+  uri:
+    url: "http://{{ iautomate_hostname }}:{{ iautomate_port }}/iAutomateAPI/Request/UpdateRunbookStatus/1"
+    validate_certs: no
+    user: "{{ iautomate_user }}"
+    password: "{{ iautomate_password }}"
+    method: PUT
+    status_code: 200
+    return_content: yes
+    force_basic_auth: yes
+    body_format: json
+    body: "{{ lookup('template','status.json.j2') }}" 
+  delegate_to: localhost
+  become: false
+  register: status_update_iautomate
+  #failed_when: status_update_iautomate.json.result.status == "Fail"
+
