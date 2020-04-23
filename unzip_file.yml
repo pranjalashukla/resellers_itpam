@@ -1,0 +1,100 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - add_host:
+      host: "{{ target_host }}"
+      groups: windows_iautomate
+
+  - include: snow_database_fetch.yml
+
+- hosts: windows_iautomate
+  gather_facts: no
+  tasks:
+## THIS BLOCK IS CHECKING THE SERVER REACHABILITY ##
+  - block:
+    - wait_for_connection:
+        timeout: 60
+    - setup:
+    - set_fact:
+        username: "{{ hostvars['localhost']['snow_username'] }}"
+        password: "{{ hostvars['localhost']['snow_password'] }}"
+        instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
+        L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
+
+
+    - include_role:
+        name: iautomate_update
+      vars:
+        status_codes: 0
+        iautomate_success: "Ansible execution In-Progress"
+
+    - include_role:
+        name: snow_update
+        tasks_from: progress
+      vars:
+        assign_ansible: "Ansible has started working on this ticket"
+
+    rescue:
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: -1
+        iautomate_success: "Ansible cannot reach the target server" 
+
+    - include_role:
+        name: snow_update
+        tasks_from: failure
+      vars: 
+        failure_closing_note: "Ansible cannot reach the target server"
+        L2_group: "{{ L2_grp }}"
+
+    - fail:
+        msg: "Ansible Failed to reach the server"
+## THIS BLOCK PERFORMS INCIDENT REMEDIATION STEPS ##
+  - block:
+    - include_role: 
+        name: unzip_file
+
+    - include_role:
+        name: snow_update
+        tasks_from: success
+      vars:
+        resolve_message: "The provided zip file has been unzipped, hence resolving the ticket"
+        success_closing_note: "Incident resolved"
+      when: status_code is not defined
+
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 1
+        iautomate_success: "Ansible successfully performed the remediation steps" 
+      when: status_code is not defined
+
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 2
+        iautomate_success: "Ansible could not resolve the issue hence ticket is transferred"
+      when: status_code is defined
+
+    - include_role:
+        name: snow_update
+        tasks_from: transfer
+      vars: 
+        failure_closing_note: "File has not been de-compressed : {{ file_exists_error }} Hence transferring the ticket."
+        L2_group: "{{ L2_grp }}"
+      when: status_code is defined  
+
+    rescue:
+    - include_role:
+        name: iautomate_update
+      vars:
+        status_codes: -1
+        iautomate_success: "Ansible execution failed on the server" 
+    - include_role:
+        name: snow_update
+        tasks_from: failure
+      vars: 
+        failure_closing_note: "Ansible execution failed on the server. Incident transferred"
+        L2_group: "{{ L2_grp }}"
