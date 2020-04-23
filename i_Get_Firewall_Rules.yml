@@ -31,17 +31,6 @@
 
     - include_role:
         name: snow_update
-        tasks_from: fetch_snow_details
-      vars:
-        snow_db_host: 10.1.160.92
-
-    - set_fact:
-        username: "{{ snow_username.stdout_lines[2] | regex_replace(' ','') }}"
-        password: "{{ snow_pass.stdout_lines[2] | regex_replace(' ','') }}"
-        instance_name: "{{ snow_url.stdout_lines[2].split('.')[0].split('//')[1] }}"
-
-    - include_role:
-        name: snow_update
         tasks_from: progress
       vars: 
         assign_ansible: "Ansible has started working on the ticket"
