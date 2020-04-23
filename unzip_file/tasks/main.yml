@@ -1,0 +1,24 @@
+---
+
+- name: check whether zipped file exists or not
+  win_stat:
+    path: "{{ zipped_File }}"
+  register: file_exists
+
+- debug:
+    var: file_exists
+
+- set_fact:
+    status_code: 2
+    file_exists_error: "The {{ zipped_File }} does not exists"
+  when: file_exists.stat.exists == false
+
+- name: Unzip gz log
+  win_unzip:
+    src: "{{ zipped_File }}"
+    dest: "{{ unzipped_File }}"
+    creates: "{{unzipped_File}}"
+    delete_archive: yes
+
+    
+

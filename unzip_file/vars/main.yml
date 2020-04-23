@@ -1,0 +1,5 @@
+---
+# vars file for unzip_file
+targetName: 10.1.160.105
+zipped_File: C:\Users\Adminisartor\Desktop\newfile.txt
+unzipped_File: C:\unzipped
