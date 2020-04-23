@@ -1,0 +1,97 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    roleName: Get_Firewall_Rules
+  tasks:
+  - add_host:
+      host: "{{ target_host }}"
+      groups: windows_iautomate
+
+- hosts: windows
+  gather_facts: no
+  tasks:
+## THIS BLOCK IS CHECKING THE SERVER REACHABILITY ##
+  - block:
+    - wait_for_connection:
+        timeout: 60
+    - setup:
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 0
+        iautomate_success: "Ansible execution In-Progress"
+
+    - include_role:
+        name: snow_update
+        tasks_from: fetch_snow_details
+      vars:
+        snow_db_host: 10.1.160.92
+
+    - set_fact:
+        username: "{{ snow_username.stdout_lines[2] | regex_replace(' ','') }}"
+        password: "{{ snow_pass.stdout_lines[2] | regex_replace(' ','') }}"
+        instance_name: "{{ snow_url.stdout_lines[2].split('.')[0].split('//')[1] }}"
+
+    - include_role:
+        name: snow_update
+        tasks_from: progress
+      vars: 
+        assign_ansible: "Ansible has started working on the ticket"
+    rescue:
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: -1
+        iautomate_success: "Ansible cannot reach the target server" 
+     
+    - include_role:
+        name: snow_update
+        tasks_from: failure
+      vars: 
+        failure_closing_note: "Ansible cannot reach the target server"
+        L2_group: "DryIce_CustomerSupportGroup1"
+    - fail:
+        msg: "Ansible Failed to reach the server"
+## THIS BLOCK PERFORMS INCIDENT REMEDIATION STEPS ##
+  - block:
+    - include_role: 
+        name: "{{ roleName }}"
+    - include_role:
+        name: snow_update
+        tasks_from: success
+      vars:
+        resolve_message: "The Firewall rules are: {{ firewall_rules.stdout }}. Hence resolving the ticket"
+        success_closing_note: "Incident resolved"
+      when: status_code is not defined
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 1
+        iautomate_success: "Ansible successfully performed the remediation steps" 
+      when: status_code is not defined
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 2
+        iautomate_success: "Ansible could not resolve the issue hence ticket is transferred"
+      when: status_code is defined
+    - include_role:
+        name: snow_update
+        tasks_from: transfer
+      vars: 
+        failure_closing_note: "Could not get firewall rules. {{firewall_rules_error}} .Hence transferring the ticket"
+        L2_group: "{{ l2_group|default('DryIce_CustomerSupportGroup1') }}"
+      when: status_code is defined 
+    rescue:
+    - include_role:
+        name: iautomate_update
+      vars:
+        status_codes: -1
+        iautomate_success: "Ansible execution failed on the server" 
+    - include_role:
+        name: snow_update
+        tasks_from: failure
+      vars: 
+        failure_closing_note: "Ansible execution failed on the server. Incident transferred"
+        L2_group: "DryIce_CustomerSupportGroup1"
