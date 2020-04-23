@@ -1,0 +1,20 @@
+---
+- name: Add DNS feature
+  win_shell: Add-WindowsFeature -name DNS -IncludeManagementTools;
+  register: dns_feature
+
+- debug:
+    var: dns_feature
+ 
+- name: Get DNS server diagnostics 
+  win_shell: Get-DnsServerDiagnostics
+  register: dns_diag
+ 
+- debug:
+    var: dns_diag
+
+- set_fact:
+    status_code: 2
+    dns_diag_error: "{{ dns_diag.stderr }}"
+  when: dns_diag is failed
+
