@@ -2,21 +2,21 @@
 # tasks file for CheckDBStatusPNP
 
 - name: Validate if server SQL server or not
-  win_command: sqlcmd -S "{{ target_host }}" -U "{{ username1 }}" -P "{{ password1 }}" -Q "select @@VERSION"
+  win_command: sqlcmd -S "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}" -Q "select @@VERSION"
   register: version_output
 
 - debug:
     var: version_output
 
 - name: Checks if the given Database exists or not
-  win_command: sqlcmd -S "{{ target_host }}" -U "{{ username1 }}" -P "{{ password1 }}" -Q " select name from sys.sysdatabases where name="{{ dbName }}"";
+  win_command: sqlcmd -S "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}" -Q " select name from sys.sysdatabases where name="{{ dbName }}"";
   register: db_exists
 
 - debug:
     var: db_exists
 
 - name: Report status of database
-  win_command: sqlcmd -S "{{ target_host }}" -U "{{ username1 }}" -P "{{ password1 }}"  -Q " SELECT '{{dbName}}' AS DatabaseName, DATABASEPROPERTYEX('{{dbName}}', 'Status') AS DBStatus"
+  win_command: sqlcmd -S "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}"  -Q " SELECT '{{dbName}}' AS DatabaseName, DATABASEPROPERTYEX('{{dbName}}', 'Status') AS DBStatus"
   register: db_status
 #  when: db_exists.name == {{ dbName }}
 
