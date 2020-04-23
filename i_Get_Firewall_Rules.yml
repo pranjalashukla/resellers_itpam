@@ -1,12 +1,12 @@
 ---
 - hosts: localhost
   gather_facts: no
-  vars:
-    roleName: Get_Firewall_Rules
   tasks:
   - add_host:
       host: "{{ target_host }}"
       groups: windows_iautomate
+    
+  - include: snow_database_fetch.yml
 
 - hosts: windows
   gather_facts: no
@@ -16,6 +16,13 @@
     - wait_for_connection:
         timeout: 60
     - setup:
+    
+    - set_fact:
+        username: "{{ hostvars['localhost']['snow_username'] }}"
+        password: "{{ hostvars['localhost']['snow_password'] }}"
+        instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
+        snow_L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
+        
     - include_role: 
         name: iautomate_update
       vars:
@@ -50,13 +57,13 @@
         tasks_from: failure
       vars: 
         failure_closing_note: "Ansible cannot reach the target server"
-        L2_group: "DryIce_CustomerSupportGroup1"
+        L2_group: "{{ L2_grp }}"
     - fail:
         msg: "Ansible Failed to reach the server"
 ## THIS BLOCK PERFORMS INCIDENT REMEDIATION STEPS ##
   - block:
     - include_role: 
-        name: "{{ roleName }}"
+        name: Get_Firewall_Rules
     - include_role:
         name: snow_update
         tasks_from: success
@@ -94,4 +101,4 @@
         tasks_from: failure
       vars: 
         failure_closing_note: "Ansible execution failed on the server. Incident transferred"
-        L2_group: "DryIce_CustomerSupportGroup1"
+        L2_group: "{{ L2_grp }}"
