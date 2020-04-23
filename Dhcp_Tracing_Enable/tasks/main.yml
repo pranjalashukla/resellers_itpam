@@ -9,5 +9,5 @@
 
 - set_fact:
     status_code: 2
-    transfer_msg: " Ansible could not enable the Dhcpclient tracing , hence transferring the ticket"
+    dhcp_status_error: " Ansible could not enable the Dhcpclient tracing :"{{ dns_diag.stderr }}" , hence transferring the ticket"
   when: dhcp_status is failed
