@@ -1,0 +1,45 @@
+---
+  
+- name: Validate if server SQL server or not
+  win_command: sqlcmd -S "{{targetName}}" -U "{{username}}" -P "{{password}}" -Q "select @@VERSION"
+  register: version_output
+ 
+- debug:
+    var: version_output
+
+- name: Checks if the given Database exists or not
+  win_command: sqlcmd -S "{{targetName}}" -U "{{ username }}"  -P "{{password}}" -Q " select name from sys.sysdatabases where name="{{dbName}}"";
+  register: db_exists
+
+- debug:
+    var: db_exists
+ 
+- name: performs the backup of the database
+  win_command: sqlcmd -S "{{targetName}}" -U "{{username}}" -P "{{password}}" -Q "BACKUP DATABASE {{dbName}} TO DISK = '{{backup_path}}'"
+#  win_command: sqlcmd -S "{{targetName}}" -U "{{username}}" -P "{{password}}"  -Q " BACKUP DATABASE "{{ dbName }}" to disk ='{{ backup_path }}'" 
+  register: db_backup
+
+- debug:
+    var: db_backup
+
+- name: verifies the backup file created of the database, if it is valid or not
+  win_command: sqlcmd -S "{{targetName}}" -U "{{username}}" -P "{{password}}" -Q " RESTORE VERIFYONLY FROM DISK ='{{ backup_path }}'"
+  register: verify_backup
+
+- debug:
+    var: verify_backup
+
+- set_fact:
+    status_code: 2
+    version_error: "{{version_output.stderr}}"
+  when: version_output is failed
+
+- set_fact:
+    status_code: 2
+    db_error: "{{db_exists.stderr}}"
+  when: db_exists is failed and version_output is success
+
+- set_fact:
+    status_code: 2
+    db_backup_error: "{{db_backup.stderr}}"
+  when: db_backup  is failed and db_exists is success
