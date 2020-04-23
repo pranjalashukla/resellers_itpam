@@ -13,12 +13,12 @@
 #- debug:
 #    var: db_exists
 
-- name: Report status of database
-  win_command: sqlcmd -S "{{target_host}}" -U "{{db_user}}" -P "{{db_pass}}"  -Q " SELECT '{{dbName}}' AS DatabaseName, DATABASEPROPERTYEX('{{dbName}}', 'Status') AS DBStatus"
-  register: db_status
+#- name: Report status of database
+#  win_command: sqlcmd -S "{{target_host}}" -U "{{db_user}}" -P "{{db_pass}}"  -Q " SELECT '{{dbName}}' AS DatabaseName, DATABASEPROPERTYEX('{{dbName}}', 'Status') AS DBStatus"
+#  register: db_status
 
-- debug:
-    var: db_status
+#- debug:
+#    var: db_status
 
 - name: Reports DB log file growth rate for each database
   win_shell: |    
@@ -38,10 +38,10 @@
 #    db_error: "{{db_exists.stderr}}"
 #  when: db_exists is failed and version_output is success
 
-- set_fact:
-    status_code: 2
-    db_status_error: "{{db_status.stderr}}"
-  when: db_status is failed #and db_exists is success
+#- set_fact:
+#    status_code: 2
+#    db_status_error: "{{db_status.stderr}}"
+#  when: db_status is failed and db_exists is success
 
 - set_fact:
     status_code: 2
