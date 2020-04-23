@@ -21,7 +21,7 @@
         username: "{{ hostvars['localhost']['snow_username'] }}"
         password: "{{ hostvars['localhost']['snow_password'] }}"
         instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
-        snow_L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
+        L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
 
     - include_role:
         name: iautomate_update
@@ -83,7 +83,7 @@
         tasks_from: transfer
       vars: 
         failure_closing_note: "Could not fetch DNS Diagnostics. {{ dns_diag_error }} Hence transferring the ticket."
-        L2_group: "{{ l2_group|default('DryIce_CustomerSupportGroup1') }}"
+        L2_group: "{{ L2_grp }}"
       when: status_code is defined  
 
     rescue:
