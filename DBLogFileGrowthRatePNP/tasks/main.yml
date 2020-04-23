@@ -1,20 +1,20 @@
 ---
 - name: Validate if server SQL server or not
-  win_shell: sqlcmd -S "{{ targetName }}" -U "{{ username }}" -P "{{ password }}" -Q "select @@VERSION"
+  win_shell: sqlcmd -S "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}" -Q "select @@VERSION"
   register: version_output
  
 - debug:
     var: version_output
 
 - name: Checks if the given Database exists or not
-  win_shell: sqlcmd -S "{{ targetName }}" -U "{{ username }}" -P "{{ password }}" -Q " select name from sys.sysdatabases "
+  win_shell: sqlcmd -S "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}" -Q " select name from sys.sysdatabases "
   register: db_exists
 
 - debug:
     var: db_exists
 
 - name: Report status of database
-  win_command: sqlcmd -S "{{targetName}}" -U "{{username}}" -P "{{password}}"  -Q " SELECT '{{dbName}}' AS DatabaseName, DATABASEPROPERTYEX('{{dbName}}', 'Status') AS DBStatus"
+  win_command: sqlcmd -S "{{target_host}}" -U "{{db_user}}" -P "{{db_pass}}"  -Q " SELECT '{{dbName}}' AS DatabaseName, DATABASEPROPERTYEX('{{dbName}}', 'Status') AS DBStatus"
   register: db_status
 
 - debug:
@@ -22,7 +22,7 @@
 
 - name: Reports DB log file growth rate for each database
   win_shell: |    
-    sqlcmd -S "{{ targetName }}" -U "{{ username }}" -P "{{ password }}"  -Q " SELECT databasename = DB_NAME(dbid),name,fileid,drive = LEFT(filename,1), filename,filegroup = FILEGROUP_NAME(groupid),'size KB' = CONVERT(nvarchar(15), CONVERT(bigint, size) * 8), 'maxsize KB' = (CASE maxsize WHEN-1 THEN N'Unlimited' ELSE CONVERT(nvarchar(15), CONVERT(bigint, maxsize) * 8) END), 'growth' = (CASE status & 0x100000 WHEN 0x100000 THEN CONVERT(nvarchar(15), growth) + N'%' ELSE CONVERT(nvarchar(15), CONVERT(bigint, growth) * 8) END), 'usage' = (CASE status & 0x40 WHEN 0x40 THEN 'log only' ELSE 'data only' END) FROM sys.sysaltfiles ORDER BY drive, size"
+    sqlcmd -S "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}"  -Q " SELECT databasename = DB_NAME(dbid),name,fileid,drive = LEFT(filename,1), filename,filegroup = FILEGROUP_NAME(groupid),'size KB' = CONVERT(nvarchar(15), CONVERT(bigint, size) * 8), 'maxsize KB' = (CASE maxsize WHEN-1 THEN N'Unlimited' ELSE CONVERT(nvarchar(15), CONVERT(bigint, maxsize) * 8) END), 'growth' = (CASE status & 0x100000 WHEN 0x100000 THEN CONVERT(nvarchar(15), growth) + N'%' ELSE CONVERT(nvarchar(15), CONVERT(bigint, growth) * 8) END), 'usage' = (CASE status & 0x40 WHEN 0x40 THEN 'log only' ELSE 'data only' END) FROM sys.sysaltfiles ORDER BY drive, size"
   register: dblogfile_growth
 
 - debug:
