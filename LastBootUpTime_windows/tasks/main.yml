@@ -1,0 +1,15 @@
+---
+#- hosts: WINDOWS
+#  vars:
+#    targetName: 10.1.160.18
+  
+#  tasks:
+#- name: Ping Windows Hosts
+#  win_ping:
+
+- name: display lastboot time
+  win_shell: Get-WmiObject win32_operatingsystem | select csname, @{LABEL='LastBootUpTime';EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}};
+  register: boot_time
+  
+- debug:
+    var: boot_time
