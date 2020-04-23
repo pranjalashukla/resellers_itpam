@@ -5,44 +5,9 @@
   - add_host:
       host: "{{ target_host }}"
       groups: windows_iautomate
-  - include_vars:
-        file: servers
-        name: key
-      no_log: true
-
-   - set_fact:
-       snow_db_password: "{{key.pass}}"
-       snow_db_username: "{{key.user}}"
-       snow_db_ip: "{{key.host}}"
-
-   - include_role:
-       name: database_fetch
-       tasks_from: fetch_snow_details
-     vars:
-       snow_db_host: "{{ snow_db_ip }}"
-       db_username: "{{ snow_db_username }}"
-       db_password: "{{ snow_db_password }}"
-
-   - set_fact:
-       username: "{{ snow_username.stdout_lines[2] | regex_replace(' ','') }}"
-       password: "{{ snow_pass.stdout_lines[2] | regex_replace(' ','') }}"
-       instance_name: "{{ snow_url.stdout_lines[2].split('.')[0].split('//')[1] }}"
-       L2_grp: "{{ snow_assign_group.stdout_lines[2] }}"
-
-   - include_role:
-       name: database_fetch
-       tasks_from: fetch_db_creds
-     vars:
-        snow_db_host: "{{ snow_db_ip }}"
-        db_username: "{{ snow_db_username }}"
-        db_password: "{{ snow_db_password }}"
-
-   - set_fact:
-       db_user: "{{ sql_username.stdout_lines[2] | regex_replace(' ','') }}"
-       db_pass: "{{ sql_password.stdout_lines[2] | regex_replace(' ','') }}"
-
-
-- hosts: windows
+  - include: snow_database_fetch.yml
+  
+- hosts: windows_iautomate
   gather_facts: no
   tasks:
 ## THIS BLOCK IS CHECKING THE SERVER REACHABILITY ##
@@ -50,6 +15,12 @@
     - wait_for_connection:
         timeout: 60
     - setup:
+    
+    - set_fact:
+        username: "{{ hostvars['localhost']['snow_username'] }}"
+        password: "{{ hostvars['localhost']['snow_password'] }}"
+        instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
+        L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
     
     - include_role: 
         name: iautomate_update
