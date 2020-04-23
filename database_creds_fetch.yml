@@ -1,0 +1,12 @@
+---
+- include_role:
+    name: database_fetch
+    tasks_from: fetch_db_creds
+  vars:
+    snow_db_host: "{{ snow_db_ip }}"
+    db_username: "{{ snow_db_username }}"
+    db_password: "{{ snow_db_password }}"
+
+- set_fact:
+    db_user: "{{ sql_username.stdout_lines[2] | regex_replace(' ','') }}"
+    db_pass: "{{ sql_password.stdout_lines[2] | regex_replace(' ','') }}"
