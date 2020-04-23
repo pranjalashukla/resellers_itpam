@@ -1,0 +1,16 @@
+---
+- name: listing the env varibles
+  setup:
+  register: env_var
+
+- debug:
+    msg: "{{ansible_env}}"
+
+- set_fact:
+    ansible_env: "{{ansible_env}}"
+
+- set_fact:
+    status_code: 2
+    env_error: "{{env_var.stderr}}"
+  when: env_var is failed
+
