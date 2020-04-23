@@ -1,0 +1,13 @@
+---
+
+- name: Enabling DHCP client
+  win_shell: netsh dhcpclient trace enable
+  register: dhcp_status
+
+- debug:
+    var: dhcp_status
+
+#- set_fact:
+#    l2_group: "DryIce_CustomerSupportGroup1"
+#    status_code: 2
+#    transfer_msg: " Ansible could not enable the Dhcpclient tracing , hence transferring the ticket"
