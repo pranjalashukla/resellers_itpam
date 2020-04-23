@@ -1,14 +1,14 @@
 ---
-#- hosts: localhost
-#  gather_facts: no
-#  vars:
-#    roleName: unzip_file
-#  tasks:
-#  - add_host:
-#      host: "{{ target_host }}"
-#      groups: windows_iautomate
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - add_host:
+      host: "{{ target_host }}"
+      groups: windows_iautomate
 
-- hosts: 10.1.160.105
+  - include: snow_database_fetch.yml  
+
+- hosts: windows_iautomate
   gather_facts: no
   tasks:
 ## THIS BLOCK IS CHECKING THE SERVER REACHABILITY ##
@@ -16,34 +16,46 @@
     - wait_for_connection:
         timeout: 60
     - setup:
-    #- include_role: 
-    #    name: iautomate_update
-    #  vars:
-    #    status_codes: 0
-    #    iautomate_success: "Ansible execution In-Progress" 
+
+    - set_fact:
+        username: "{{ hostvars['localhost']['snow_username'] }}"
+        password: "{{ hostvars['localhost']['snow_password'] }}"
+        instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
+        L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
+
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 0
+        iautomate_success: "Ansible execution In-Progress" 
+
     - include_role:
         name: snow_update
         tasks_from: progress
-      vars: 
+      vars:
         assign_ansible: "Ansible has started working on this ticket"
     rescue:
-    #- include_role: 
-    #    name: iautomate_update
-    #  vars:
-    #    status_codes: -1
-    #    iautomate_success: "Ansible cannot reach the target server" 
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: -1
+        iautomate_success: "Ansible cannot reach the target server" 
     - include_role:
         name: snow_update
         tasks_from: failure
       vars: 
         failure_closing_note: "Ansible cannot reach the target server"
-        L2_group: "DryIce_CustomerSupportGroup1"
+        L2_group: "{{ L2_grp }}"
     - fail:
         msg: "Ansible Failed to reach the server"
 ## THIS BLOCK PERFORMS INCIDENT REMEDIATION STEPS ##
   - block:
     - include_role: 
         name: "LastBootUpTime_windows"
+      vars:
+        username1: "{{ db_user }}"
+        password1: "{{ db_pass }}"
+
     - include_role:
         name: snow_update
         tasks_from: success
@@ -51,34 +63,34 @@
         resolve_message: "The Last Bootup Time is: {{ boot_time.stdout }} Hence resolving the ticket"
         success_closing_note: "Incident resolved"
       when: status_code is not defined
-    #- include_role: 
-    #    name: iautomate_update
-    #  vars:
-    #    status_codes: 1
-    #    iautomate_success: "Ansible successfully performed the remediation steps" 
-    #  when: status_code is not defined
-    #- include_role: 
-    #    name: iautomate_update
-    #  vars:
-    #    status_codes: 2
-    #    iautomate_success: "Ansible could not resolve the issue hence ticket is transferred"
-    #  when: status_code is defined
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 1
+        iautomate_success: "Ansible successfully performed the remediation steps" 
+      when: status_code is not defined
+    - include_role: 
+        name: iautomate_update
+      vars:
+        status_codes: 2
+        iautomate_success: "Ansible could not resolve the issue due to {{ boot_time.stdout }}. Hence ticket is transferred"
+      when: status_code is defined
     - include_role:
         name: snow_update
         tasks_from: transfer
       vars: 
-        failure_closing_note: "Workflow failed during execution due to following reason: {{ boot_time.stdout }}. Hence transferring the ticket for further resolution"
-        L2_group: "{{ l2_group|default('DryIce_CustomerSupportGroup1') }}"
+        failure_closing_note: "Workflow failed during execution due to following reason: {{ boot_time.stdout }}. Hence transferring the ticket for further resolution."
+        L2_group: "{{ L2_grp }}"
       when: status_code is defined  ## status_code variable is defined in add_user_linux
     rescue:
-    #- include_role:
-    #    name: iautomate_update
-    #  vars:
-    #    status_codes: -1
-    #    iautomate_success: "Ansible execution failed on the server" 
+    - include_role:
+        name: iautomate_update
+      vars:
+        status_codes: -1
+        iautomate_success: "Ansible execution failed on the server" 
     - include_role:
         name: snow_update
         tasks_from: failure
       vars: 
         failure_closing_note: "Ansible execution failed on the server. Incident transferred"
-        L2_group: "DryIce_CustomerSupportGroup1"
+        L2_group: "{{ L2_grp }}"
