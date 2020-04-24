@@ -9,7 +9,7 @@
   - include: snow_database_fetch.yml 
   - include: database_creds_fetch.yml
 
-- hosts: windows
+- hosts: windows_iautomate
   gather_facts: no
   tasks:
 ## THIS BLOCK IS CHECKING THE SERVER REACHABILITY ##
