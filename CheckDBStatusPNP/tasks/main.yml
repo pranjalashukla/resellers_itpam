@@ -41,6 +41,6 @@
 
 - set_fact:
     status_code: 2
-    error_message: "{{free_space.stdout_lines}}"
+    error_message: "{{db_status.stdout_lines}}"
   when: '"{{dbName}}" not in db_exists.stdout and version_output is success and db_exists is success'
 
