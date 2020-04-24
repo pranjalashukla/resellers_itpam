@@ -10,7 +10,6 @@
 
 - set_fact:
     status_code: 2
-    file_exists_error: "{{file_exists.stderr}}"
   when: file_exists.stat.exists == false
 
 - name: Unzip gz log
