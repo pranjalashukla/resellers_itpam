@@ -11,7 +11,7 @@
     state: present
     number: "{{ snow_incident_id }}"
     data:
-      work_notes : "Ansible could not resolve the issue on {{ target_host }} \n Ticket Number {{ snow_incident_id }} \n\n Error Message \n {{ error_msg }}\nAssigning to L2 Support"
+      work_notes : "Ansible could not resolve the issue on {{ target_host }} \n Ticket Number {{ snow_incident_id }} \n\n Error Message \n {{ error_msg }}\nAssigning to L2 Support {{ L2_group }}"
       state: "New"
       close_notes: "{{ failure_closing_note }}"
       assignment_group: "{{ L2_group }}"
