@@ -9,5 +9,5 @@
 
 - set_fact:
     status_code: 2
-    dhcp_status_error: "{{ dhcp_status.stderr }}" 
+    dhcp_status_error: "{{ dhcp_status.stdout }}" 
   when: dhcp_status is failed
