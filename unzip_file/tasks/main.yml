@@ -18,7 +18,7 @@
     dest: "{{ unzipped_File }}"
     creates: "{{unzipped_File}}"
     delete_archive: yes
-  when: file_exists.stat.exists == true
+  #when: file_exists.stat.exists == true
   register: unzip_status
 
     
