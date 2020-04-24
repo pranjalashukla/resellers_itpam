@@ -79,9 +79,11 @@
         name: snow_update
         tasks_from: transfer
       vars: 
-        failure_closing_note: "Could not get database status,{{ db_status.stderr }} hence transferring the ticket"
+        ansible_failed_result: "{{error_message|default(' ')}} \n\n {{version_error|default(' ')}} \n\n  {{db_error|default(' ')}} \n\n {{db_status_error|default(' ')}} "
+        transfer_msg: "Ansible could not check the Database Status. \n\n ERROR MESSAGE: \n {{error_message|default(' ')}} {{version_error|default(' ')}} \n\n  {{db_error|default(' ')}} \n\n {{db_status_error|default(' ')}} \n\n Hence transferring the ticket"
+        failure_closing_note: "Ansible could not check the Database Status. \n\nERROR MESSAGE: \n {{error_message|default(' ')}} \n\n Hence transferring the ticket."
         L2_group: "{{ L2_grp }}"
-      when: status_code is defined  ## status_code variable is defined in add_user_linux
+      when: status_code is defined  
     rescue:
     - include_role:
         name: iautomate_update
