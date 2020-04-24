@@ -79,8 +79,8 @@
         name: snow_update
         tasks_from: transfer
       vars: 
-        ansible_failed_result: "{{error_message|default(' ')}} \n\n {{version_error|default(' ')}} \n\n  {{db_error|default(' ')}} \n\n {{free_space_error|default(' ')}} "
-        transfer_msg: "ansible could not backup the DB. \n\n ERROR MESSAGE: \n {{error_message|default(' ')}} {{version_error|default(' ')}} \n\n  {{db_error|default(' ')}} \n\n {{free_space_error|default(' ')}} \n\n hence transferring the ticket"
+        ansible_failed_result: "{{error_message|default(' ')}} \n\n {{version_error|default(' ')}} \n\n  {{db_error|default(' ')}} \n\n {{db_backup_error|default(' ')}} "
+        transfer_msg: "ansible could not backup the DB. \n\n ERROR MESSAGE: \n {{error_message|default(' ')}} {{version_error|default(' ')}} \n\n  {{db_error|default(' ')}} \n\n {{db_backup_error|default(' ')}} \n\n hence transferring the ticket"
 
         failure_closing_note: "ansible could not backup the DB. \n\nERROR MESSAGE: \n {{error_message|default(' ')}} \n\n hence transferring the ticket."
         L2_group: "{{ L2_grp }}"
