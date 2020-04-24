@@ -83,7 +83,7 @@
         tasks_from: transfer
       vars: 
         transfer_msg: " The {{zipped_file}} does not exist , Hence transferring the ticket."
-        failure_closing_note: "File has not been de-compressed : {{ file_exists_error }} Hence transferring the ticket."
+        failure_closing_note: " Zip file doesnt exist at {{zipped_file}} ,Hence transferring the ticket."
         L2_group: "{{ L2_grp }}"
       when: status_code is defined  
 
