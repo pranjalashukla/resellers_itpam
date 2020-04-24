@@ -60,7 +60,7 @@
         name: snow_update
         tasks_from: success
       vars:
-        resolve_message: "Environment Variables are:{{ ansible_env }}, hence resolving the ticket"
+        resolve_message: "Environment Variables are:{{ env_var.stdout }}, hence resolving the ticket"
         success_closing_note: "Incident resolved"
       when: status_code is not defined
 
