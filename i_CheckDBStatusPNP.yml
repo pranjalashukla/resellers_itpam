@@ -7,7 +7,9 @@
       groups: windows_iautomate
       
   - include: snow_database_fetch.yml
+    no_log: true
   - include: database_creds_fetch.yml
+    no_log: true
   
 - hosts: windows_iautomate
   gather_facts: no
