@@ -80,7 +80,8 @@
         tasks_from: transfer
       vars: 
         failure_closing_note: "Could not get database backup, hence transferring the ticket"
-        L2_group: "{{ l2_group|default('DryIce_CustomerSupportGroup1') }}"
+        ansible_failed_result: "Could not get database backup, hence transferring the ticket"
+        L2_group: "{{ L2_grp }}"
       when: status_code is defined  ## status_code variable is defined in add_user_linux
     rescue:
     - include_role:
