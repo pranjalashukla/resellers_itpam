@@ -40,9 +40,9 @@
   when: db_exists is failed and version_output is success
   
 - set_fact:
-  status_code: 2
-  error_message: "{{db_backup.stdout_lines}}"
-when: '"{{dbName}}" not in db_exists.stdout and version_output is success and db_exists is success'
+    status_code: 2
+    error_message: "{{db_backup.stdout_lines}}"
+  when: '"{{dbName}}" not in db_exists.stdout and version_output is success and db_exists is success'
 
 - set_fact:
     status_code: 2
