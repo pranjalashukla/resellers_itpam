@@ -82,7 +82,7 @@
         name: snow_update
         tasks_from: transfer
       vars:
-        transfer_msg: "Could not enable the dhcpclient tracing : {{ dhcp_status.stderr }} Hence transferring the ticket."
+        transfer_msg: "Could not enable the dhcpclient tracing : {{ dhcp_status.stdout }} Hence transferring the ticket."
         failure_closing_note: "Could not enable the dhcpclient tracing : {{ dhcp_status_error }} Hence transferring the ticket."
         L2_group: "{{ L2_grp }}"
       when: status_code is defined  
