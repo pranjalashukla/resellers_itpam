@@ -62,7 +62,7 @@
         name: snow_update
         tasks_from: success
       vars:
-        resolve_message: "The Database status is: {{ db_status.stdout }}. Hence resolving the ticket"
+        resolve_message: "The Database status is: \n\n {{ db_status.stdout_lines[0] }} \n\n {{ db_status.stdout_lines[2] }}. \n\n Hence resolving the ticket"
         success_closing_note: "Incident resolved"
       when: status_code is not defined
     - include_role: 
