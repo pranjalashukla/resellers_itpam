@@ -63,7 +63,7 @@
         name: snow_update
         tasks_from: success
       vars:
-        resolve_message: "Database log file growth rate is:{{ dblogfile_growth.stdout }}, hence resolving the ticket"
+        resolve_message: "Database log file growth rate is:{{ dblogfile_growth.stdout_lines }}, hence resolving the ticket"
         success_closing_note: "Incident resolved"
       when: status_code is not defined
 
@@ -85,7 +85,9 @@
         name: snow_update
         tasks_from: transfer
       vars: 
-        failure_closing_note: "Could not fetch DB log file growth rate. {{ error_message }} Hence transferring the ticket."
+        ansible_failed_result: "{{error_message|default(' ')}} \n\n {{version_error|default(' ')}}"
+        transfer_msg: "Ansible could not get the Database log file growth rate. \n\n ERROR MESSAGE: \n {{error_message|default(' ')}} {{version_error|default(' ')}} \n\n Hence transferring the ticket"
+        failure_closing_note: "Ansible could not get the Database log file growth rate. \n\nERROR MESSAGE: \n {{error_message|default(' ')}} \n\n Hence transferring the ticket."
         L2_group: "{{ L2_grp }}"
       when: status_code is defined  
 
