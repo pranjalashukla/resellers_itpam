@@ -4,7 +4,7 @@
   register: env_var
 
 - debug:
-    msg: "{{ansible_env.stdout_lines.split(',')}}"
+    msg: "{{ansible_env}}"
 
 - set_fact:
     ansible_env: "{{ansible_env}}"
