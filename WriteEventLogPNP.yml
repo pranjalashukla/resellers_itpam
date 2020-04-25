@@ -58,7 +58,7 @@
         name: snow_update
         tasks_from: success
       vars:
-        resolve_message: "The message: {{ message }} \n is written to the event log of {{ logname }} with event id: {{ eventID }}. \n Hence resolving the ticket"
+        resolve_message: "The message: {{ message }} \n by {{ source }} is written to the event log of {{ logname }} with event id: {{ eventID }}. \n Hence resolving the ticket"
         success_closing_note: "Incident resolved"
       when: status_code is not defined
     - include_role: 
@@ -71,13 +71,13 @@
         name: iautomate_update
       vars:
         status_codes: 2
-        iautomate_success: "Ansible could not update the event logs of of {{ logname }} with the message: {{ message }} \n due to {{ event_log.stderr }}. Hence ticket is transferred"
+        iautomate_success: "Ansible could not update the event logs of {{ logname }} with the message: {{ message }} \n by {{ source }} due to {{ event_log.stderr }}. Hence ticket is transferred"
       when: status_code is defined
     - include_role:
         name: snow_update
         tasks_from: transfer
       vars: 
-        failure_closing_note: "Ansible could not update the event logs of of {{ logname }} with the message: {{ message }} \n due to {{ event_log.stderr }}. Hence ticket is transferred"
+        failure_closing_note: "Ansible could not update the event logs of of {{ logname }} with the message: {{ message }} \n by {{ source }} due to {{ event_log.stderr }}. Hence ticket is transferred"
         L2_group: "{{ L2_grp }}"
       when: status_code is defined  ## status_code variable is defined in add_user_linux
     rescue:
