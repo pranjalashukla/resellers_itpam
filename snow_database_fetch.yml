@@ -1,6 +1,6 @@
 ---
   - include_vars:
-        file: servers
+        file: /var/servers
         name: key
     no_log: true
 
