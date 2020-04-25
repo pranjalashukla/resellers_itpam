@@ -1,0 +1,9 @@
+---
+
+- name: Write event log
+  win_shell: write-eventlog -logname "{{ logname }}" -source "{{ source }}" -eventID "{{ eventID }}" -message "{{ message }}"
+  register: event_log
+
+- debug:
+    var: event_log
+
