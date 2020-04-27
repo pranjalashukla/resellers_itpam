@@ -37,6 +37,7 @@
         name: snow_update
         tasks_from: failure
       vars: 
+        error_msg: "Ansible cannot reach the target server"
         failure_closing_note: "Ansible cannot reach the target server"
         L2_group: "{{ L2_grp }}"
     - fail:
