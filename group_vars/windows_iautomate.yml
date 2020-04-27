@@ -1,5 +1,12 @@
 ---
+#snow credentials
 username: "{{ hostvars['localhost']['snow_username'] }}"
 password: "{{ hostvars['localhost']['snow_password'] }}"
 instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
 L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
+
+#iautomate credentials
+iautomate_hostname: "{{ hostvars['localhost']['iautomate_hostname'] }}"
+iautomate_user: "{{ hostvars['localhost']['iautomate_user'] }}"
+iautomate_password: "{{ hostvars['localhost']['iautomate_password'] }}"
+iautomate_port: "{{ hostvars['localhost']['iautomate_port'] }}"
