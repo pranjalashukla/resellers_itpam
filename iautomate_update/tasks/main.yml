@@ -1,6 +1,6 @@
 ---
 # tasks file for iautomate_update
-- include_vars: iautomate_credentials.yml
+#- include_vars: iautomate_credentials.yml
 #  no_log: True
 
 - name: update iautomate url about status
