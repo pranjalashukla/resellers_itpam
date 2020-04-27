@@ -19,7 +19,7 @@
   register: i_password
 
 - debug:
-    var: i_pass.stdout_lines[2] | regex_replace(' ','')
+    var: i_password.stdout_lines[2] | regex_replace(' ','')
 
 - name: Fetch Iautomate Port
   command: sqlcmd -S {{ snow_db_host }} -U {{ db_username }} -P {{ db_password }} -Q "SELECT VarValue FROM [iAutomate_Ansible].[dbo].[Iautomate_Ansible_AccountDetails] where TenantID='{{ tenant_id }}' and VarName='Iauto_Port'"
