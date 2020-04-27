@@ -41,6 +41,7 @@
         tasks_from: failure
       vars: 
         failure_closing_note: "Ansible cannot reach the target server"
+        error_msg: "Ansible cannot reach the target server"
         L2_group: "{{ L2_grp }}"
 
     - fail:
