@@ -1,0 +1,5 @@
+---
+username: "{{ hostvars['localhost']['snow_username'] }}"
+password: "{{ hostvars['localhost']['snow_password'] }}"
+instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
+L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
