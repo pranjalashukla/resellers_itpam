@@ -6,7 +6,7 @@
       host: "{{ target_host }}"
       groups: windows_iautomate
   
-  - include: snow_database_fetch.yml 
+  - include: database_fetch.yml 
   - include: database_creds_fetch.yml
 
 - hosts: windows_iautomate
@@ -17,15 +17,6 @@
     - wait_for_connection:
         timeout: 60
     - setup:
-
-    - set_fact:
-        username: "{{ hostvars['localhost']['snow_username'] }}"
-        password: "{{ hostvars['localhost']['snow_password'] }}"
-        instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
-        L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
-        db_user: "{{ hostvars['localhost']['db_user'] }}"
-        db_pass: "{{ hostvars['localhost']['db_pass'] }}"
-
     - include_role: 
         name: iautomate_update
       vars:
@@ -47,6 +38,7 @@
         name: snow_update
         tasks_from: failure
       vars: 
+        error_msg: "Ansible cannot reach the target server"
         failure_closing_note: "Ansible cannot reach the target server"
         L2_group: "{{ L2_grp }}"
     - fail:
