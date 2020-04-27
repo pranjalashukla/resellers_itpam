@@ -35,6 +35,13 @@
       vars: 
         assign_ansible: "Ansible has started working on the ticket"
     rescue:
+    
+    - set_fact:
+        username: "{{ hostvars['localhost']['snow_username'] }}"
+        password: "{{ hostvars['localhost']['snow_password'] }}"
+        instance_name: "{{ hostvars['localhost']['snow_instance_name'] }}"
+        L2_grp: "{{ hostvars['localhost']['snow_L2_grp'] }}"
+        
     - include_role: 
         name: iautomate_update
       vars:
