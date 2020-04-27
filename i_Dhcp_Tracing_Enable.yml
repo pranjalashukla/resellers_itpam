@@ -6,7 +6,7 @@
       host: "{{ target_host }}"
       groups: windows_iautomate
   
-  - include: snow_database_fetch.yml
+  - include: database_fetch.yml
 
 - hosts: windows_iautomate
   gather_facts: no
