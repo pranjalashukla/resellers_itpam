@@ -22,9 +22,17 @@
       snow_password: "{{ snow_pass.stdout_lines[2] | regex_replace(' ','') }}"
       snow_instance_name: "{{ snow_url.stdout_lines[2].split('.')[0].split('//')[1] }}"
       snow_L2_grp: "{{ snow_assign_group.stdout_lines[2] }}"
-
-
-
-
-  
-
+     
+  - include_role:
+      name: database_fetch
+      tasks_from: fetch_iautomate_details
+    vars:
+      snow_db_host: "{{ snow_db_ip }}"
+      db_username: "{{ snow_db_username }}"
+      db_password: "{{ snow_db_password }}"
+      
+  - set_fact:
+      i_hostname: "{{ i_hostname.stdout_lines[2] | regex_replace(' ','') }}"
+      i_username: "{{ i_username.stdout_lines[2] | regex_replace(' ','') }}"
+      i_password: "{{ i_password.stdout_lines[2] | regex_replace(' ','') }}"
+      i_port: "{{ i_port.stdout_lines[2] | regex_replace(' ','') }}"
