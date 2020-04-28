@@ -1,0 +1,93 @@
+---
+# tasks file for DiskCleanUpWindows
+
+- name: execute powershell
+  win_command:  powershell.exe "Get-PSDrive C | Select-Object Free | ConvertTo-Json"
+  register: getpsdrive
+
+- debug:
+    var: getpsdrive
+
+- name: Register free disk space  as a fact
+  set_fact:
+    free_disk_space: "{{ ((getpsdrive.stdout | from_json)).Free|int }}"
+
+- debug:
+    var: getpsdrive
+ 
+- debug:
+    var: free_disk_space
+
+- name: execute powershell
+  win_command:  powershell.exe "Get-PSDrive C | Select-Object Used | ConvertTo-Json"
+  register: usedpsdrive
+
+- name: Register Used disk space as a fact
+  set_fact:
+    used_disk_space: "{{ ((usedpsdrive.stdout | from_json)).Used|int}}"
+
+- debug:
+    var: used_disk_space
+
+- set_fact:
+    total_disk_space: "{{ ((getpsdrive.stdout | from_json)).Free|int+(usedpsdrive.stdout | from_json).Used|int }}"
+
+- debug:
+    var: total_disk_space
+
+- set_fact:
+    used_disk_space_percentage: "{{ ((used_disk_space|int)/total_disk_space|int)*100}}"
+
+- debug:
+    var: used_disk_space_percentage
+
+- debug: msg="the used disk space is less than threshold"
+  when: 'used_disk_space_percentage|int < {{threshold}}'
+
+- debug: msg="the used disk space is more than threshold"
+  when: 'used_disk_space_percentage|int >= {{threshold}}'
+
+- name: remove recycle bin data
+  win_shell: ((New-Object -ComObject Shell.Application).NameSpace(0xa)).items() | foreach { rm $_.path -force -recurse }
+  register: remove_bin_data
+  when: 'used_disk_space_percentage | int >= {{threshold}}'
+
+- debug:
+    var: remove_bin_data
+
+- name: remove the temporary files
+  win_command: "cmd.exe /c del /q/f/s %temp%\\*"
+  register: remove_temp_files
+  when: 'used_disk_space_percentage| int >= {{threshold}}'
+
+- debug:
+    var: remove_temp_files
+- name: execute powershell
+  win_command:  powershell.exe "Get-PSDrive C | Select-Object Used | ConvertTo-Json"
+  register: usedpsdrive_check
+
+- name: Getting free disk space 
+  set_fact:
+    used_disk_space_check: "{{ ((usedpsdrive_check.stdout | from_json)).Used|int }}"
+
+- debug:
+    var: used_disk_space_check
+
+- set_fact:
+    used_disk_space_percentage_check: "{{(((used_disk_space_check|int)/total_disk_space|int)*100|int)}}"
+
+- debug:
+    var: used_disk_space_percentage_check
+
+- set_fact:
+    status_code: 2
+  when: 'used_disk_space_percentage_check|int >= {{threshold}}'
+
+- name: Get Disk info
+  win_shell: "Get-WmiObject -Class Win32_OperatingSystem -Namespace root/cimv2|Format-List TotalVirtualMemorySize,TotalVisibleMemorySize,FreePhysicalMemory,FreeVirtualMemory,FreeSpaceInPagingFiles"
+  register: disk_info
+  when: 'used_disk_space_percentage_check|int < {{threshold}}'
+
+- debug:
+    var: disk_info
+
