@@ -17,6 +17,9 @@
     - wait_for_connection:
         timeout: 60
     - setup:
+    - set_fact:
+        db_user: "{{ hostvars['localhost']['db_user'] }}"
+        db_pass: "{{ hostvars['localhost']['db_pass'] }}"
     - include_role: 
         name: iautomate_update
       vars:
