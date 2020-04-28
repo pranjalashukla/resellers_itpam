@@ -1,0 +1,44 @@
+---
+# tasks file for ModifyFileSize
+
+- name: Validate if server SQL server or not
+  win_command: sqlcmd -S "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}" -Q "select @@VERSION"
+  register: version_output
+
+- debug:
+    var: version_output
+
+- name: Checks if the given Database exists or not
+  win_command: sqlcmd -S "{{target_host}}" -U "{{ db_user }}" -P "{{ db_pass }}" -Q " select name from sys.sysdatabases where name="{{dbName}}"";
+  register: check_db
+
+- debug:
+    var: check_db
+
+- name: Modifies DB log file Size
+  win_command: sqlcmd -S  "{{ target_host }}" -U "{{ db_user }}" -P "{{ db_pass }}" -Q "ALTER DATABASE {{dbName}} MODIFY FILE (Name={{dblogfile}},Size={{size}})"
+  register: modify_log_size
+
+- debug:
+    var: modify_log_size
+
+- set_fact:
+    status_code: 2
+    version_error: "{{version_output.stderr}}"
+  when: version_output is failed
+
+- set_fact:
+    status_code: 2
+    check_db_error: "{{check_db.stderr}}"
+  when: check_db is failed and version_output is success
+
+- set_fact:
+    status_code: 2
+    modify_log_size__error: "{{modify_log_size.stderr}}"
+  when: modify_log_size is failed and check_db is success
+
+- set_fact:
+    status_code: 2
+    error_message: "{{modify_log_size.stdout_lines}}"
+  when: '"{{dbName}}" not in check_db.stdout and version_output is success and check_db is success'
+
